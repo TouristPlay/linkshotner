@@ -1,0 +1,68 @@
+version: '3'
+
+services:
+    ngnix:
+        image: nginx:latest
+        volumes:
+            -   ./_docker/nginx/conf.d/:/etc/nginx/conf.d
+            -   ./:/var/www/
+        ports:
+            -   "80:80"
+        container_name: IS3-backend-nginx
+        depends_on:
+            -   IS3-backend-app
+            -   IS3-frontend-app
+        networks:
+            - app-network
+
+    backend:
+        build:
+            context: .
+            dockerfile: _docker/app/Dockerfile
+        volumes:
+            -   ./:/var/www
+        container_name: IS3-backend-app
+        depends_on:
+            -   db
+        networks:
+            - app-network
+
+    db:
+        image: postgres:15
+        restart: always
+        volumes:
+            - ./_docker/postgres/data:/var/lib/postgresql/data
+        ports:
+            -   "5432:5432"
+        environment:
+             POSTGRES_PASSWORD: root
+             POSTGRES_USER: root
+             POSTGRES_DB: littlefony
+             PGDATA: /var/lib/postgresql/data
+        container_name: IS3-backend-db
+
+    pgadmin:
+        image: dpage/pgadmin4:latest
+        container_name: IS3-backend-pgadmin
+        ports:
+            -   "5050:80"
+        depends_on:
+            -   db
+        environment:
+              PGADMIN_DEFAULT_EMAIL: turist374@gmail.com
+              PGADMIN_DEFAULT_PASSWORD: root
+
+    redis:
+        image: redis:latest
+        container_name: IS3-backend-redis
+        restart: always
+        ports:
+            -   "6379:6379"
+        volumes:
+            -   ./_docker/redis/data:/data
+        depends_on:
+            -   backend
+#Docker Networks
+networks:
+    app-network:
+        driver: bridge
