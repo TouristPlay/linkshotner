@@ -1,24 +1,23 @@
 version: '3'
 
 services:
-    ngnix:
+    nginx:
         image: nginx:latest
         volumes:
-            -   ./_docker/nginx/conf.d/:/etc/nginx/conf.d
+            -   ./.docker/nginx/conf.d/:/etc/nginx/conf.d
             -   ./:/var/www/
         ports:
             -   "80:80"
         container_name: IS3-backend-nginx
         depends_on:
-            -   IS3-backend-app
-            -   IS3-frontend-app
+            -   backend
         networks:
             - app-network
 
     backend:
         build:
             context: .
-            dockerfile: _docker/app/Dockerfile
+            dockerfile: .docker/app/Dockerfile
         volumes:
             -   ./:/var/www
         container_name: IS3-backend-app
@@ -31,7 +30,7 @@ services:
         image: postgres:15
         restart: always
         volumes:
-            - ./_docker/postgres/data:/var/lib/postgresql/data
+            - ./.docker/postgres/data:/var/lib/postgresql/data
         ports:
             -   "5432:5432"
         environment:
@@ -40,6 +39,8 @@ services:
              POSTGRES_DB: littlefony
              PGDATA: /var/lib/postgresql/data
         container_name: IS3-backend-db
+        networks:
+          - app-network
 
     pgadmin:
         image: dpage/pgadmin4:latest
@@ -51,6 +52,8 @@ services:
         environment:
               PGADMIN_DEFAULT_EMAIL: turist374@gmail.com
               PGADMIN_DEFAULT_PASSWORD: root
+        networks:
+          - app-network
 
     redis:
         image: redis:latest
@@ -59,9 +62,37 @@ services:
         ports:
             -   "6379:6379"
         volumes:
-            -   ./_docker/redis/data:/data
+            -   ./.docker/redis/data:/data
         depends_on:
             -   backend
+        networks:
+          - app-network
+
+    clickhouse:
+        image: clickhouse/clickhouse-server
+        container_name: IS3-backend-clickhouse
+        ports:
+          - "8123:8123"
+          - "9000:9000"
+        volumes:
+          - ./.docker/clickhouse/data:/var/lib/clickhouse
+#          - ./clickhouse/config.xml:/etc/clickhouse-server/config.xml
+#          - ./clickhouse/users.xml:/etc/clickhouse-server/users.xml
+        networks:
+          - app-network
+        depends_on:
+          - backend
+    clickhouse-web:
+        image: spoonest/clickhouse-tabix-web-client
+        container_name: IS3-backend-clickhouse-web
+        restart: unless-stopped
+        ports:
+          - "3000:80"
+        networks:
+          - app-network
+        depends_on:
+          - clickhouse
+
 #Docker Networks
 networks:
     app-network:

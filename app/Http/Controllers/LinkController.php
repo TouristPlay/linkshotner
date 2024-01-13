@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\StatisticService;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -179,21 +181,36 @@ class LinkController extends Controller
      */
     public function show($slug)
     {
+
+        $statisticService = new StatisticService();
+
         $link = Link::query()
             ->where('slug', $slug)
             ->where('user_id', Auth::user()->id)
             ->firstOrFail();
 
-        return view('link.show', ['link' => $link]);
+        return view('link.show', [
+            'link' => $link,
+            'statistic' => [
+                'transition' => $statisticService->getTransitionStatistic($link->id),
+                'browser' => $statisticService->getBrowserStatistic($link->id),
+                'os' => $statisticService->getOperationSystemStatistic($link->id),
+                'country' => $statisticService->getCountryStatistic($link->id),
+            ]
+        ]);
     }
 
 
     /**
      * @param $slug
+     * @param Request $request
      * @return Application|RedirectResponse|Redirector
+     * @throws GuzzleException
      */
-    public function redirect($slug)
+    public function redirect($slug, Request $request)
     {
+
+
         $link = Link::query()
             ->where('slug', $slug)
             ->firstOrFail();
@@ -201,6 +218,12 @@ class LinkController extends Controller
         if ($link->status === 0) {
             abort(404);
         }
+
+        // TODO в очередь пихнуть это дело
+        // TODO автоинкремент не работает
+        $statisticService = new StatisticService();
+        $statisticService->handle($request, $link);
+
 
         $link->increment('counter', 1);
         return redirect($link->link);

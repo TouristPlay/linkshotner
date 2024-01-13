@@ -13,6 +13,7 @@
 
   <!-- Styles -->
   <link rel="icon" href="{{ url('img/logo2-white.png') }}">
+
   <link rel="stylesheet" href="{{ asset('css/app.css') }}">
 
   @livewireStyles
@@ -22,6 +23,15 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.8/clipboard.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+    <script src="{{ asset('jqvmap/dist/jquery.vmap.js')  }}"></script>
+    <script src="{{ asset('jqvmap/dist/maps/jquery.vmap.world.js')  }}"></script>
+    <link href="{{ asset('jqvmap/dist/jqvmap.css')  }}" media="screen" rel="stylesheet" type="text/css">
+
+{{--    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqvmap/1.5.1/jqvmap.min.css"></script>--}}
+{{--  <script src="https://cdnjs.cloudflare.com/ajax/libs/jqvmap/1.5.1/jquery.vmap.min.js"></script>--}}
+
+    <script src="https://cdn.plot.ly/plotly-2.20.0.min.js" charset="utf-8"></script>
 
 </head>
 

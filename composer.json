@@ -9,17 +9,24 @@
     "license": "MIT",
     "require": {
         "php": "^7.3|^8.0",
+        "ext-http": "*",
+        "ext-json": "*",
         "fideloper/proxy": "^4.4",
         "fruitcake/laravel-cors": "^2.0",
+        "glushkovds/phpclickhouse-laravel": "^1.17",
+        "guzzle/guzzle": "^3.8",
         "guzzlehttp/guzzle": "^7.0.1",
+        "hisorange/browser-detect": "^4.5",
         "laravel/framework": "^8.12",
         "laravel/jetstream": "^1.6",
         "laravel/sanctum": "^2.6",
         "laravel/socialite": "^5.1",
         "laravel/tinker": "^2.5",
         "livewire/livewire": "^2.0",
+        "predis/predis": "^2.1",
         "realrashid/sweet-alert": "^3.1",
-        "simplesoftwareio/simple-qrcode": "^4.1"
+        "simplesoftwareio/simple-qrcode": "^4.1",
+        "smi2/phpclickhouse": "^1.5"
     },
     "require-dev": {
         "facade/ignition": "^2.5",

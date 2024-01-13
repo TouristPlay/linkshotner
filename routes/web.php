@@ -14,6 +14,20 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+
+//Route::get('tester', function () {
+////    $whois = new \App\Services\Api\IpWhois\WhoisService();
+////
+////    dd($whois->getWhoisInfo(''));
+//
+//
+//    $urlID = 3;
+//
+//    $statSer = new \App\Services\StatisticService();
+//    $date = $statSer->getBrowserStatistic($urlID);
+//    dd($date);
+//});
+
 Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
     return view('dashboard');
 })->name('dashboard');

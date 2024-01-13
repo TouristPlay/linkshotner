@@ -14,7 +14,7 @@ class CreateTransitionStatistic extends \PhpClickHouseLaravel\Migration
     {
         static::write('
             CREATE TABLE transition_statistic (
-                uuid UUID,
+                id UUID,
                 url_id Nullable(UInt32),
                 continent Nullable(String),
                 continent_code Nullable(String),
@@ -32,7 +32,7 @@ class CreateTransitionStatistic extends \PhpClickHouseLaravel\Migration
                 os Nullable(String),
                 device Nullable(String),
                 deviceModel Nullable(String),
-                request_time Nullable(DateTime),
+                request_time Nullable(Date),
                 created_at DateTime,
             )
             ENGINE = MergeTree()

@@ -134,9 +134,46 @@
             </div>
           </div>
 
-          <div style="width: 600px; margin: auto;">
-            <canvas id="myChart"></canvas>
-          </div>
+            <div class="statistic" style="margin-top: 50px; margin-left: 50px; display: flex">
+                <div class="statistic-layout" style="margin-top: 30px;display: flex;flex-direction: column;align-content: center;justify-content: center;align-items: center;">
+                    <h2 style="font-size: 30px; font-weight: bold; margin-bottom: 20px" >Статистика</h2>
+                    <div class="transition-layout stat-item-layout">
+                        <span class="layout-text">Переходы</span>
+                        <div id="transition" style="width:1100px;height:300px;">
+
+                        </div>
+                    </div>
+
+                   <div class="statistic-row" style="display: flex; width: 1100px; margin-top: 50px; justify-content: space-between">
+                       <div class="browser-layout stat-item-layout">
+                           <span class="layout-text">Браузер</span>
+                           <div id="browser" style="width:540px;height:300px;">
+
+                           </div>
+                       </div>
+                       <div class="operationSystem-layout stat-item-layout">
+                           <span class="layout-text"> Операционная система</span>
+                           <div id="operationSystem" style="width:540px;height:300px;">
+
+                           </div>
+                       </div>
+
+                   </div>
+
+
+                    <div class="vmap-layout stat-item-layout" style="margin: 40px 0;">
+                        <span class="layout-text">Страны</span>
+                        <div id="vmap" style="width: 1100px; height: 500px;">
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+            </div>
+
+
 
         </div>
 
@@ -146,6 +183,96 @@
 
   @section('customScript')
   <script>
+
+      let countryCodeData =   {!!  json_encode($statistic['country'])  !!};
+      let countryCode = {};
+      for (i = 0; i < countryCodeData.length; i++) {
+          countryCode[countryCodeData[i].code.toLowerCase()] = parseInt(countryCodeData[i].count);
+      }
+
+      jQuery(document).ready(function() {
+          jQuery('#vmap').vectorMap({
+              map: 'world_en',
+              backgroundColor: '#fff',
+              borderColor: '#818181',
+              borderOpacity: 0.25,
+              borderWidth: 1,
+              color: '#848080',
+              enableZoom: true,
+              hoverOpacity: 0.7,
+              normalizeFunction: 'polynomial',
+              scaleColors: ['#b6d6ff', '#005ace'],
+              selectedColor: '#999999',
+              values: countryCode,
+              showTooltip: true,
+              onLabelShow: function(event, label, code)
+              {
+                  let hasKey = (countryCode[code] !== undefined);
+                  label.text(label.text() + ': ' + (hasKey ? countryCode[code] : 0));
+              }
+          });
+      });
+
+
+      let transitionData =   {!!  json_encode($statistic['transition'])  !!};
+      let transitionChartX = [];
+      let transitionChartY = [];
+      for (i = 0; i < transitionData.length; i++) {
+          transitionChartX.push(transitionData[i].date)
+          transitionChartY.push(transitionData[i].count)
+      }
+
+
+      TESTER = document.getElementById('transition');
+      Plotly.newPlot( TESTER, [{
+          x: transitionChartX,
+          y: transitionChartY,
+          line: {'shape': 'spline', 'smoothing': 1.3}
+      }],
+          {
+              margin: { t: 0 },
+          });
+
+
+
+      let browserData =   {!!  json_encode($statistic['browser'])  !!};
+      let browserChartX = [];
+      let browserChartY = [];
+      for (i = 0; i < browserData.length; i++) {
+          browserChartX.push(browserData[i].name)
+          browserChartY.push(browserData[i].count)
+      }
+
+      var browser = [
+          {
+              x: browserChartX,
+              y: browserChartY,
+              type: 'bar'
+          }
+      ];
+
+      Plotly.newPlot('browser', browser);
+
+
+      let operationSystemData =   {!!  json_encode($statistic['os'])  !!};
+      let operationSystemChartX = [];
+      let operationSystemChartY = [];
+      for (i = 0; i < operationSystemData.length; i++) {
+          operationSystemChartX.push(operationSystemData[i].name)
+          operationSystemChartY.push(operationSystemData[i].count)
+      }
+
+      var operationSystem = [
+          {
+              x: operationSystemChartX,
+              y: operationSystemChartY,
+              type: 'bar'
+          }
+      ];
+
+      Plotly.newPlot('operationSystem', operationSystem);
+
+
     $(document).on('click', '.delete-link', function (e) {
             e.preventDefault();
             Swal.fire({
@@ -157,7 +284,7 @@
                 cancelButtonColor: '#d33',
                 confirmButtonText: 'Да, удалить'
             }).then((result) => {
-                if (result.isConfirmed) { 
+                if (result.isConfirmed) {
                     window.location.replace("/delete/" + {!! json_encode($link->slug) !!});
                 }
             })
@@ -167,3 +294,30 @@
   </script>
   @endsection
 </x-app-layout>
+
+
+
+<style>
+
+    .jqvmap-zoomin, .jqvmap-zoomout {
+        padding: 0;
+        width: 20px;
+        height: 20px;
+        line-height: 20px;
+    }
+
+    .jqvmap-zoomout {
+        top: 35px;
+    }
+
+    .stat-item-layout {
+        border: 1px solid rgba(0,0,0,.125);
+        box-shadow: 0 5px 20px rgba(0,0,0,.1);
+    }
+
+    .layout-text {
+        display: inline-block;
+       margin: 10px 0 0 10px;
+    }
+
+</style>

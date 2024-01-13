@@ -1,4 +1,4 @@
-FROM php:8.1-fpm
+FROM php:7.4-fpm
 
 WORKDIR /var/www
 
@@ -25,7 +25,7 @@ RUN apt-get update && apt-get install -y \
             appuser
 
 
-COPY ./_docker/app/php.ini /usr/local/etc/php/conf.d/php.ini
+COPY ./.docker/app/php.ini /usr/local/etc/php/conf.d/php.ini
 
 # Install composer
 ENV COMPOSER_ALLOW_SUPERUSER=1
