@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="SqlDialectMappings">
-    <file url="file://$PROJECT_DIR$/database/migrations/2023_05_13_123123_create_transition_statistic.php" dialect="GenericSQL" />
-    <file url="PROJECT" dialect="ClickHouse" />
-  </component>
-</project>
