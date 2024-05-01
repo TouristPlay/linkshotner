@@ -1,3 +1,0 @@
-format version: 1
-create time: 2023-05-16 20:14:01
-commands: UPDATE request_time = \'2023-05-15\' WHERE id = \'3f294337-6e03-42b5-8aa1-1038ac287bcb\'

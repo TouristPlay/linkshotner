@@ -1,3 +1,0 @@
-format version: 1
-create time: 2023-05-16 08:59:50
-commands: DELETE WHERE (id = \'f9d4fdab-830d-42fe-8720-cb5540b7ba9e\') AND (url_id = \'1\') AND (continent = \'Европа\') AND (continent_code = \'EU\') AND (country = \'Россия\') AND (country_code = \'RU\') AND (region = \'Республика Мордовия\') AND (city = \'Саранск\') AND (postal = \'430000\') AND (timezone = \'Europe/Moscow\') AND (connection_provider = \'PJSC Rostelecom\') AND (latitude = \'54.2000477\') AND (longitude = \'45.1745115\') AND (ip = \'85.95.188.202\') AND (browser = \'Yandex Browser\') AND (os = \'Windows\') AND (device IS NULL) AND (deviceModel = \'\') AND (request_time = \'2023-05-16 08:51:48\') AND (created_at = \'2023-05-16 08:51:49\')
