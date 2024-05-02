@@ -37,6 +37,3 @@ RUN chown appuser:appuser /var/www
 # copy composer (json|lock) files for dependencies layer caching
 COPY --chown=appuser:appuser . /var/www
 USER appuser:appuser
-
-
-

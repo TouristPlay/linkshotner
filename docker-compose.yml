@@ -1,97 +1,89 @@
-version: '3'
+version: '3.7'
 
 services:
     nginx:
         image: nginx:latest
+        container_name: "${PROJECT_NAME}_nginx"
         volumes:
-            -   ./.docker/nginx/conf.d/:/etc/nginx/conf.d
-            -   ./:/var/www/
+            - ./.docker/nginx/conf.d/:/etc/nginx/conf.d
+            - ./:/var/www/
         ports:
-            -   "80:80"
-        container_name: IS3-backend-nginx
+            - "80:80"
         depends_on:
-            -   backend
-        networks:
-            - app-network
+            - app
 
-    backend:
+    app:
         build:
             context: .
             dockerfile: .docker/app/Dockerfile
+        container_name: "${PROJECT_NAME}_app"
         volumes:
-            -   ./:/var/www
-        container_name: IS3-backend-app
+            - ./:/var/www
         depends_on:
-            -   db
-        networks:
-            - app-network
+            - db
 
     db:
         image: postgres:15
+        container_name: "${PROJECT_NAME}_db"
         restart: always
         volumes:
-            - ./.docker/postgres/data:/var/lib/postgresql/data
+            - db:/var/lib/postgresql/data
         ports:
-            -   "5432:5432"
+            - "5432:5432"
         environment:
-             POSTGRES_PASSWORD: root
-             POSTGRES_USER: root
-             POSTGRES_DB: littlefony
-             PGDATA: /var/lib/postgresql/data
-        container_name: IS3-backend-db
-        networks:
-          - app-network
+             POSTGRES_PASSWORD: ${DB_PASSWORD}
+             POSTGRES_USER: ${DB_USERNAME}
+             POSTGRES_DB: ${DB_DATABASE}
 
     pgadmin:
         image: dpage/pgadmin4:latest
-        container_name: IS3-backend-pgadmin
+        container_name: "${PROJECT_NAME}_pgadmin"
         ports:
-            -   "5050:80"
+            - "5050:80"
         depends_on:
-            -   db
+            - db
         environment:
               PGADMIN_DEFAULT_EMAIL: turist374@gmail.com
               PGADMIN_DEFAULT_PASSWORD: root
-        networks:
-          - app-network
 
     redis:
         image: redis:latest
-        container_name: IS3-backend-redis
+        container_name: "${PROJECT_NAME}_redis"
         restart: always
         ports:
-            -   "6379:6379"
+            - "6379:6379"
         volumes:
-            -   ./.docker/redis/data:/data
+            - redis:/data
         depends_on:
-            -   backend
-        networks:
-          - app-network
+            - app
 
     clickhouse:
         image: clickhouse/clickhouse-server
-        container_name: IS3-backend-clickhouse
+        container_name: "${PROJECT_NAME}_clickhouse"
         ports:
           - "8123:8123"
           - "9000:9000"
         volumes:
-          - ./.docker/clickhouse/data:/var/lib/clickhouse
-#          - ./clickhouse/config.xml:/etc/clickhouse-server/config.xml
-#          - ./clickhouse/users.xml:/etc/clickhouse-server/users.xml
-        networks:
-          - app-network
+          - clickhouse:/var/lib/clickhouse
         depends_on:
-          - backend
+          - app
+
     clickhouse-web:
         image: spoonest/clickhouse-tabix-web-client
-        container_name: IS3-backend-clickhouse-web
+        container_name: "${PROJECT_NAME}_clickhouse_web"
         restart: unless-stopped
         ports:
-          - "3000:80"
-        networks:
-          - app-network
+          - "3000:3000"
         depends_on:
           - clickhouse
+
+volumes:
+  db:
+    name: ${PROJECT_NAME}_pgsql
+  redis:
+    name: ${PROJECT_NAME}_redis
+  clickhouse:
+    name: ${PROJECT_NAME}_clickhouse
 
 #Docker Networks
 networks:
