@@ -42,7 +42,7 @@ class LinkController extends Controller
     public function shorten()
     {
         return view('shortener', [
-            'randomSlug' => Str::random(5)
+            'randomSlug' => Str::random(6)
         ]);
     }
 
