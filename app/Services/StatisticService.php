@@ -2,13 +2,13 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Str as Str;
 use App\Services\Api\IpWhois\WhoisData;
 use App\Services\Api\IpWhois\WhoisService;
+use hisorange\BrowserDetect\Parser as Parser;
 use Carbon\Carbon;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Request;
-use hisorange\BrowserDetect\Parser;
-use Illuminate\Support\Str;
 
 
 class StatisticService
