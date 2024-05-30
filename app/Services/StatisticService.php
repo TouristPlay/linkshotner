@@ -31,7 +31,6 @@ class StatisticService
      */
     public function handle(Request $request, $link) {
 
-        //dd($request);
         $requestData = $this->getRequestData($request);
         $whoisData = $this->whoisService->getWhoisInfo($requestData['ip']);
         $this->save($requestData, $whoisData, $link);
@@ -39,9 +38,7 @@ class StatisticService
     }
 
     private function save($requestData, WhoisData $whoisData, $link) {
-
-        //dd($requestData, $whoisData, $link, (new Parser())->detect());
-
+        
         $model = \App\Models\Clickhouse\TransitionStatistic::create([
             'id' => Str::uuid(),
             'url_id' => $link->id,
@@ -82,7 +79,6 @@ class StatisticService
             'device' => $data->deviceFamily() == "Unknown" ? null : $data->deviceFamily(),
             'deviceModel' => $data->deviceModel(),
             'requestTime' => $request->server()['REQUEST_TIME'] ?? Carbon::now()->getTimestamp(),
-            //'ip' => '85.95.188.202',
             'ip' => $request->server()['HTTP_X_REAL_IP'] ?? null,
         ];
     }

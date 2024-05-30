@@ -84,8 +84,3 @@ volumes:
     name: ${PROJECT_NAME}_redis
   clickhouse:
     name: ${PROJECT_NAME}_clickhouse
-
-#Docker Networks
-networks:
-    app-network:
-        driver: bridge

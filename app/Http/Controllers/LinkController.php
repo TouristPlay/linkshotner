@@ -3,29 +3,23 @@
 namespace App\Http\Controllers;
 
 use App\Services\StatisticService;
-use GuzzleHttp\Exception\GuzzleException;
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\View\Factory;
-use Illuminate\Contracts\View\View;
+use Illuminate\Contracts\Foundation\Application as Application;
+use Illuminate\Contracts\View\Factory as Factory;
+use Illuminate\Contracts\View\View as View;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Routing\Redirector;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth as Auth;
+use Illuminate\Http\Request as Request;
 use Illuminate\Support\Str;
-use App\Models\Link;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
-use RealRashid\SweetAlert\Facades\Alert;
-use Illuminate\Validation\Rule;
+use App\Models\Link as Link;
+use SimpleSoftwareIO\QrCode\Facades\QrCode as QrCode;
+use RealRashid\SweetAlert\Facades\Alert as Alert;
+use Illuminate\Validation\Rule as Rule;
 use Illuminate\Support\Facades\Validator;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\BinaryFileResponse as BinaryFileResponse;
 
 class LinkController extends Controller
 {
-
-
-    /**
-     * @return Application|Factory|View
-     */
+    
     public function index()
     {
         $links = Link::query()->
@@ -34,22 +28,14 @@ class LinkController extends Controller
 
         return view('dashboard', ['links' => $links]);
     }
-
-
-    /**
-     * @return Application|Factory|View
-     */
+    
     public function shorten()
     {
         return view('shortener', [
             'randomSlug' => Str::random(6)
         ]);
     }
-
-    /**
-     * @param $id
-     * @return RedirectResponse
-     */
+    
     public function revertStatus($id): RedirectResponse
     {
         $link = Link::query()
@@ -60,11 +46,7 @@ class LinkController extends Controller
 
         return back();
     }
-
-    /**
-     * @param Request $request
-     * @return RedirectResponse
-     */
+    
     public function store(Request $request): RedirectResponse
     {
 
@@ -91,11 +73,7 @@ class LinkController extends Controller
         return redirect()->route('showLink', ['slug' => $link->slug]);
     }
 
-
-    /**
-     * @param $slug
-     * @return BinaryFileResponse
-     */
+    
     public function downloadQR($slug): BinaryFileResponse
     {
         $dest = storage_path('app/qrCode.svg');
@@ -119,12 +97,7 @@ class LinkController extends Controller
 
         return view('link.edit', ['link' => $link]);
     }
-
-    /**
-     * @param Request $request
-     * @param $slug
-     * @return RedirectResponse
-     */
+    
     public function update(Request $request , $slug): RedirectResponse
     {
         $link = Link::query()
@@ -155,12 +128,7 @@ class LinkController extends Controller
         return redirect()->route('showLink', ['slug' => $link->slug]);
     }
 
-
-    /**
-     * @param $slug
-     * @return RedirectResponse
-     * @throws \Exception
-     */
+    
     public function delete($slug): RedirectResponse
     {
         $link = Link::query()
@@ -174,11 +142,7 @@ class LinkController extends Controller
         return redirect()->route('dashboard');
     }
 
-
-    /**
-     * @param $slug
-     * @return Application|Factory|View
-     */
+    
     public function show($slug)
     {
 
@@ -200,13 +164,7 @@ class LinkController extends Controller
         ]);
     }
 
-
-    /**
-     * @param $slug
-     * @param Request $request
-     * @return Application|RedirectResponse|Redirector
-     * @throws GuzzleException
-     */
+    
     public function redirect($slug, Request $request)
     {
 
@@ -218,9 +176,7 @@ class LinkController extends Controller
         if ($link->status === 0) {
             abort(404);
         }
-
-        // TODO в очередь пихнуть это дело
-        // TODO автоинкремент не работает
+        
         $statisticService = new StatisticService();
         $statisticService->handle($request, $link);
 

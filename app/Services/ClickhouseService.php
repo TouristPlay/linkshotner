@@ -2,8 +2,6 @@
 
 namespace App\Services;
 
-
-
 class ClickhouseService
 {
 
@@ -42,3 +40,5 @@ class ClickhouseService
     }
 
 }
+
+
