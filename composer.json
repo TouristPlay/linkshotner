@@ -6,6 +6,13 @@
         "framework",
         "laravel"
     ],
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://packagist.org"
+        },
+        { "packagist": false }
+    ],
     "license": "MIT",
     "require": {
         "php": "^7.3|^8.0",
