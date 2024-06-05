@@ -112,7 +112,7 @@
                       Статус
                     </dt>
                     <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                      @if ($link->status === 1)
+                      @if ($link->status === true)
                       <a href="{{ route('revertStatus', ['id' => $link->id]) }}">
                         <span
                           class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
