@@ -173,7 +173,7 @@ class LinkController extends Controller
             ->where('slug', $slug)
             ->firstOrFail();
 
-        if ($link->status === 0) {
+        if ($link->status === false) {
             abort(404);
         }
         
