@@ -53,5 +53,5 @@
                 </div>
             </div>
         </form>
-    </x-jet-authentication-card>ы
+    </x-jet-authentication-card>
 </x-guest-layout>
