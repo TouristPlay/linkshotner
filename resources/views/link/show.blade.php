@@ -236,7 +236,7 @@
       Plotly.newPlot( TESTER, [{
           x: transitionChartX,
           y: transitionChartY,
-          line: {'shape': 'spline', 'smoothing': 1.3}
+              line: {'smoothing': 1.3}
       }],
           {
               margin: { t: 0 },
