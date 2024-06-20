@@ -32,7 +32,7 @@ class CreateTransitionStatistic extends \PhpClickHouseLaravel\Migration
                 os Nullable(String),
                 device Nullable(String),
                 deviceModel Nullable(String),
-                request_time Nullable(Date),
+                request_time Nullable(DateTime),
                 created_at DateTime,
             )
             ENGINE = MergeTree()

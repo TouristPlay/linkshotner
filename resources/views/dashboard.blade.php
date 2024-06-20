@@ -1,11 +1,35 @@
+
 <x-app-layout>
   <x-slot name="header">
-    <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-      {{ __('Дашборд') }}
-    </h2>
+    <div class="flex justify-between justify-items-center">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            {{ __('Дашборд') }}
+        </h2>
+
+        <div>
+            <form action="{{ route('dashboard') }}" method="GET" role="search">
+                <div class="input-group">
+                        <span class="input-group-btn mr-5 mt-1">
+                            <button class="btn btn-info" type="submit" title="Поиск ссылки...">
+                                <span class="fas fa-search"></span>
+                            </button>
+                        </span>
+                    <input type="text" class="form-control mr-1" value="{{request()->get('term')}}" name="term" placeholder="Поиск ссылки..." id="term">
+                    <a href="{{ route('dashboard') }}" class=" mt-1">
+                            <span class="input-group-btn">
+                                <button class="btn btn-danger" type="button" title="Обновление страницы">
+                                    <span class="fas fa-sync-alt"></span>
+                                </button>
+                            </span>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
   </x-slot>
 
-  <div class="py-12">
+  <div class="py-9">
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
       <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
 
@@ -66,7 +90,8 @@
                       <td class="px-6 py-4">
                         <a href="{{ $link->link }}" target="_">
                           <div class="inline text-sm text-blue-500 hover:text-indigo-900">
-                            {{ $link->link }}</div>
+                              {!!\Illuminate\Support\Str::limit( $link->link, 40) !!}
+                          </div>
                         </a>
                       </td>
                       <td class="px-6 py-4 whitespace-nowrap">
@@ -98,7 +123,7 @@
                   </tbody>
                 </table>
 
-                @if($links->isEmpty())
+                @if($links->isEmpty() && request()->get('term') == null)
                 <div class="flex flex-col items-center justify-center py-20 space-y-2">
                   <h1 class="text-center">Ссылки еще нет?</h1>
                   <a href="{{ route('shortener') }}">
@@ -108,12 +133,28 @@
                   </a>
                 </div>
                 @endif
+
+                  @if($links->isEmpty() && request()->get('term') != null)
+                      <div class="flex flex-col items-center justify-center py-20 space-y-2">
+                          <h1 class="text-center">Ссылки с названием "{{request()->get('term')}}" не найдена </h1>
+                          <a href="{{ route('dashboard') }}">
+                              <button class="w-64 bg-gray-700 p-2 rounded-md shadow-md text-white hover:bg-gray-900">
+                                  Отчистить поиск
+                              </button>
+                          </a>
+                      </div>
+                  @endif
+
               </div>
             </div>
           </div>
         </div>
-
       </div>
+        @if(!$links->isEmpty())
+            <div class="flex flex-col items-center justify-center pt-4">
+                {{$links->links()}}
+            </div>
+        @endif
     </div>
   </div>
 

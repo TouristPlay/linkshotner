@@ -2,13 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\StatisticJob;
+use App\Observers\LinkObserver;
 use App\Services\StatisticService;
+use Carbon\Carbon;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Contracts\Foundation\Application as Application;
 use Illuminate\Contracts\View\Factory as Factory;
 use Illuminate\Contracts\View\View as View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth as Auth;
 use Illuminate\Http\Request as Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use App\Models\Link as Link;
 use SimpleSoftwareIO\QrCode\Facades\QrCode as QrCode;
@@ -19,23 +24,27 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse as BinaryFileResponse;
 
 class LinkController extends Controller
 {
-    
-    public function index()
+
+    public function index(Request $request)
     {
-        $links = Link::query()->
-            where('user_id', Auth::user()->id)
-            ->get();
+        $links = Link::query()
+            ->orderBy('status', 'desc')
+            ->when($request->get('term') != null, function ($query) use ($request) {
+                $query->where('name', 'LIKE', "%{$request->get('term')}%");
+            })
+            ->where('user_id', Auth::user()->id)
+            ->paginate(8);
 
         return view('dashboard', ['links' => $links]);
     }
-    
+
     public function shorten()
     {
         return view('shortener', [
             'randomSlug' => Str::random(6)
         ]);
     }
-    
+
     public function revertStatus($id): RedirectResponse
     {
         $link = Link::query()
@@ -46,14 +55,15 @@ class LinkController extends Controller
 
         return back();
     }
-    
+
     public function store(Request $request): RedirectResponse
     {
 
         $validator = Validator::make($request->all(), [
             'name' => ['bail', 'required', 'string', 'max: 50'],
-            'url' => ['bail', 'required', 'url'],
+            'url' => ['bail', 'required', 'url', 'max:10000'],
             'slug' => ['bail', 'required', 'string', 'max:30', 'unique:links,slug'],
+            'expired_at' => ['bail', 'nullable', 'date'],
         ]);
 
         if ($validator->fails()) {
@@ -66,6 +76,7 @@ class LinkController extends Controller
         $link->name = $request->name;
         $link->link = $request->url;
         $link->slug = $request->slug;
+        $link->expired_at = $request->expired_at;
         $link->user_id = Auth::check() ? Auth::id() : 1;
 
         $link->save();
@@ -73,7 +84,7 @@ class LinkController extends Controller
         return redirect()->route('showLink', ['slug' => $link->slug]);
     }
 
-    
+
     public function downloadQR($slug): BinaryFileResponse
     {
         $dest = storage_path('app/qrCode.svg');
@@ -97,7 +108,7 @@ class LinkController extends Controller
 
         return view('link.edit', ['link' => $link]);
     }
-    
+
     public function update(Request $request , $slug): RedirectResponse
     {
         $link = Link::query()
@@ -109,6 +120,7 @@ class LinkController extends Controller
             'name' => ['bail', 'required', 'string', 'max: 50'],
             'url' => ['bail', 'required', 'url'],
             'slug' => ['bail', 'required', 'string', 'max:30', Rule::unique('links')->ignore($link->id, 'id')],
+            'expired_at' => ['bail', 'nullable', 'date', 'after:' . Carbon::now()],
         ]);
 
         if ($validator->fails()) {
@@ -119,6 +131,7 @@ class LinkController extends Controller
         $link->link = $request ->url;
         $link->slug = $request ->slug;
         $link->name = $request ->name;
+        $link->expired_at = $request->expired_at;
         $link->status = $request ->linkStatus;
 
         $link->save();
@@ -128,7 +141,7 @@ class LinkController extends Controller
         return redirect()->route('showLink', ['slug' => $link->slug]);
     }
 
-    
+
     public function delete($slug): RedirectResponse
     {
         $link = Link::query()
@@ -142,7 +155,7 @@ class LinkController extends Controller
         return redirect()->route('dashboard');
     }
 
-    
+
     public function show($slug)
     {
 
@@ -164,24 +177,31 @@ class LinkController extends Controller
         ]);
     }
 
-    
+
+    /**
+     * @throws GuzzleException
+     */
     public function redirect($slug, Request $request)
     {
+        if (Cache::has(LinkObserver::CACHE_KEY . "-{$slug}")) {
+            $link = Cache::get(LinkObserver::CACHE_KEY . "-{$slug}");
+        } else {
+            $link = Link::query()
+                ->where('slug', $slug)
+                ->firstOrFail();
+        }
 
-
-        $link = Link::query()
-            ->where('slug', $slug)
-            ->firstOrFail();
-
-        if ($link->status === false) {
+        if ($link->status == false) {
             abort(404);
         }
-        
-        $statisticService = new StatisticService();
-        $statisticService->handle($request, $link);
 
+        if ($link->expired_at < Carbon::now()) {
+            abort(404);
+        }
 
-        $link->increment('counter', 1);
+        dispatch((new StatisticJob($request->all(), $link)));
+
+        $link->increment('counter');
         return redirect($link->link);
     }
 }

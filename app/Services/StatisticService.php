@@ -24,12 +24,12 @@ class StatisticService
     }
 
     /**
-     * @param Request $request
+     * @param $request
      * @param $link
      * @return void
      * @throws GuzzleException
      */
-    public function handle(Request $request, $link) {
+    public function handle($request, $link) {
 
         $requestData = $this->getRequestData($request);
         $whoisData = $this->whoisService->getWhoisInfo($requestData['ip']);
@@ -38,7 +38,7 @@ class StatisticService
     }
 
     private function save($requestData, WhoisData $whoisData, $link) {
-        
+
         $model = \App\Models\Clickhouse\TransitionStatistic::create([
             'id' => Str::uuid(),
             'url_id' => $link->id,
@@ -59,7 +59,7 @@ class StatisticService
             'device' => $requestData['device'],
             'deviceModel' => $requestData['deviceModel'],
             'request_time' => $requestData['requestTime'],
-            'created_at' => Carbon::now()->getTimestamp(),
+            'created_at' => Carbon::now(config('app.timezone')),
         ]);
 
     }
@@ -68,7 +68,7 @@ class StatisticService
      * @param Request $request
      * @return array
      */
-    private function getRequestData(Request $request): array
+    private function getRequestData($request): array
     {
 
         $data = (new Parser())->detect();
@@ -78,8 +78,10 @@ class StatisticService
             'os' => $data->platformFamily(),
             'device' => $data->deviceFamily() == "Unknown" ? null : $data->deviceFamily(),
             'deviceModel' => $data->deviceModel(),
-            'requestTime' => $request->server()['REQUEST_TIME'] ?? Carbon::now()->getTimestamp(),
-            'ip' => $request->server()['HTTP_X_REAL_IP'] ?? null,
+            'requestTime' =>
+                Carbon::createFromTimestamp(\request()->server()['REQUEST_TIME'])
+                ?? Carbon::now(config('app.timezone')),
+            'ip' => \request()->server()['HTTP_X_REAL_IP'] ?? null,
         ];
     }
 
@@ -92,7 +94,7 @@ class StatisticService
 
         foreach ($data as $item) {
             $statistic[] = [
-                'date' => $item['request_time'],
+                'date' => $item['created_at'],
                 'count' => $item['count()']
             ];
         }

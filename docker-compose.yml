@@ -12,6 +12,29 @@ services:
         depends_on:
             - app
 
+    supervisor:
+      build:
+        context: .
+        dockerfile: .docker/supervisor/Dockerfile
+      container_name: "${PROJECT_NAME}_supervisor"
+      restart: always
+      volumes:
+        - ./:/var/www/
+      depends_on:
+        - app
+
+    rabbitmq:
+      build:
+        context: .
+        dockerfile: .docker/rabbitmq/Dockerfile
+      container_name: "${PROJECT_NAME}_rabbitmq"
+      ports:
+        - "15672:15672"
+        - "5672:5672"
+      volumes:
+        - rabbitmq_data:/var/lib/rabbitmq/mnesia
+      restart: always
+
     app:
         build:
             context: .
@@ -21,6 +44,8 @@ services:
             - ./:/var/www
         depends_on:
             - db
+        environment:
+          TZ: Europe/Moscow
 
     db:
         image: postgres:15
@@ -68,15 +93,6 @@ services:
         depends_on:
           - app
 
-    clickhouse-web:
-        image: spoonest/clickhouse-tabix-web-client
-        container_name: "${PROJECT_NAME}_clickhouse_web"
-        restart: unless-stopped
-        ports:
-          - "3000:3000"
-        depends_on:
-          - clickhouse
-
 volumes:
   db:
     name: ${PROJECT_NAME}_pgsql
@@ -84,3 +100,5 @@ volumes:
     name: ${PROJECT_NAME}_redis
   clickhouse:
     name: ${PROJECT_NAME}_clickhouse
+  rabbitmq_data:
+    name: "${PROJECT_NAME}_rabbitmq"

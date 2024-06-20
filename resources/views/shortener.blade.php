@@ -35,15 +35,23 @@
                                                     value="{{ old('url') }}" required>
                                             </div>
 
-                                            <div class=" col-span-6 sm:col-span-6">
+                                            <div class=" col-span-3 sm:col-span-3">
                                                 <label for="slug" class="block text-sm font-medium text-gray-700">Личный SLUG</label>
                                                 <input type="text" name="slug" id="slug" value="{{ $randomSlug }}"
-                                                    class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-                                                    required>
+                                                       class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                                                       required>
                                                 <p class="mt-2 text-sm text-gray-500" id="linkFinal">
                                                     Сокращенная ссылка: {{ config('app.url') . $randomSlug }}
                                                 </p>
                                             </div>
+
+                                            <div class="col-span-3 sm:col-span-3">
+                                                <label for="url" class="block text-sm font-medium text-gray-700">Дата окончания действия ссылки</label>
+                                                <input type="datetime-local" name="expired_at" id="expired_at"
+                                                       class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                                                       value="{{ old('expired_at') }}">
+                                            </div>
+
                                         </div>
                                     </div>
                                     <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">

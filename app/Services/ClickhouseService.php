@@ -9,8 +9,9 @@ class ClickhouseService
     public function getTransitionCount($url): array
     {
         return \App\Models\Clickhouse\TransitionStatistic::where('url_id', $url)
-            ->select('request_time', raw('count()'))
-            ->groupBy('request_time')
+            ->select('created_at', raw('count()'))
+            ->orderBy('created_at', 'desc')
+            ->groupBy('created_at')
             ->getRows();
     }
 

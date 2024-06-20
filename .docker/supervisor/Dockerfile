@@ -1,6 +1,8 @@
 FROM php:7.4-fpm
 
-WORKDIR /var/www
+WORKDIR /var/www/
+
+RUN apt-get update && apt-get install -y supervisor
 
 RUN apt-get update && apt-get install -y \
       apt-utils \
@@ -24,18 +26,11 @@ RUN apt-get update && apt-get install -y \
             --uid 1000 \
             appuser
 
-
 COPY ./.docker/app/php.ini /usr/local/etc/php/conf.d/php.ini
-
 ENV TZ=Europe/Moscow
 
-# Install composer
-ENV COMPOSER_ALLOW_SUPERUSER=1
-RUN curl -sS https://getcomposer.org/installer | php -- \
-    --filename=composer \
-    --install-dir=/usr/local/bin
+RUN mkdir -p "/etc/supervisor/logs"
 
-RUN chown appuser:appuser /var/www
-# copy composer (json|lock) files for dependencies layer caching
-COPY --chown=appuser:appuser . /var/www
-USER appuser:appuser
+COPY .docker/supervisor/supervisord.conf /etc/supervisor/supervisord.conf
+
+CMD ["/usr/bin/supervisord", "-n", "-c",  "/etc/supervisor/supervisord.conf"]
