@@ -195,7 +195,7 @@ class LinkController extends Controller
             abort(404);
         }
 
-        if ($link->expired_at < Carbon::now()) {
+        if ($link->expired_at != null && $link->expired_at < Carbon::now()) {
             abort(404);
         }
 
