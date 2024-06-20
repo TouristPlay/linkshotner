@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\LinkController;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -33,6 +34,8 @@ Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
 })->name('dashboard');
 
 Route::group(['middleware' => ['auth']], function () {
+    App::setLocale("ru");
+
     Route::get('/', [LinkController::class, 'index'])->name('dashboard');
 
     Route::get('/shorten', [LinkController::class, 'shorten'])->name('shortener');
