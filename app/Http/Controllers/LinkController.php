@@ -183,13 +183,18 @@ class LinkController extends Controller
      */
     public function redirect($slug, Request $request)
     {
-        if (Cache::has(LinkObserver::CACHE_KEY . "-{$slug}")) {
-            $link = Cache::get(LinkObserver::CACHE_KEY . "-{$slug}");
-        } else {
-            $link = Link::query()
-                ->where('slug', $slug)
-                ->firstOrFail();
-        }
+
+        $link = Link::query()
+            ->where('slug', $slug)
+            ->firstOrFail();
+
+        // if (Cache::has(LinkObserver::CACHE_KEY . "-{$slug}")) {
+        //     $link = Cache::get(LinkObserver::CACHE_KEY . "-{$slug}");
+        // } else {
+        //     $link = Link::query()
+        //         ->where('slug', $slug)
+        //         ->firstOrFail();
+        // }
 
         if ($link->status == false) {
             abort(404);
