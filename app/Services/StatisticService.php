@@ -81,7 +81,7 @@ class StatisticService
             'requestTime' =>
                 Carbon::createFromTimestamp(\request()->server()['REQUEST_TIME'])
                 ?? Carbon::now(config('app.timezone')),
-            'ip' => \request()->server()['HTTP_X_REAL_IP'] ?? null,
+            'ip' => \request()->ip() ?? null,
         ];
     }
 
