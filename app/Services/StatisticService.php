@@ -70,7 +70,6 @@ class StatisticService
      */
     private function getRequestData($request): array
     {
-
         $data = (new Parser())->detect();
 
         return [

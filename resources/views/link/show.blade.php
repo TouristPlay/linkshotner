@@ -194,9 +194,12 @@
   <script>
 
       let countryCodeData =   {!!  json_encode($statistic['country'])  !!};
+
       let countryCode = {};
       for (i = 0; i < countryCodeData.length; i++) {
-          countryCode[countryCodeData[i].code.toLowerCase()] = parseInt(countryCodeData[i].count);
+          if (countryCodeData[i].code != null) {
+              countryCode[countryCodeData[i].code.toLowerCase()] = parseInt(countryCodeData[i].count);
+          }
       }
 
       jQuery(document).ready(function() {
@@ -221,7 +224,6 @@
               }
           });
       });
-
 
       let transitionData =   {!!  json_encode($statistic['transition'])  !!};
       let transitionChartX = [];
