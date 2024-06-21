@@ -30,6 +30,6 @@ class StatisticJob implements ShouldQueue
      */
     public function handle()
     {
-        $this->service->handle($this->request, $this->link);
+//        $this->service->handle($this->request, $this->link);
     }
 }

@@ -199,6 +199,7 @@ class LinkController extends Controller
             abort(404);
         }
 
+        (new StatisticService())->handle($request, $link);
         dispatch((new StatisticJob($request->all(), $link)));
 
         $link->increment('counter');
